@@ -1,10 +1,15 @@
 const express = require('express');
 const cors = require('cors');
+const { dbConection } = require('../database/config.db');
 
 class Server {
   constructor() {
     this.app = express();
     this.usuariosRutesPath = '/api/usuarios';
+
+    // conectar DB
+    this.conectarDB();
+
     //middlewares
     this.middlewares();
 
@@ -13,8 +18,6 @@ class Server {
 
     this.port = process.env.PORT || 3000;
   }
-
-  ////////
 
   middlewares() {
     //CORS
@@ -27,7 +30,10 @@ class Server {
     this.app.use(express.static('public'));
   }
 
-  ////////
+  async conectarDB() {
+    await dbConection();
+    console.log('DB is connected');
+  }
 
   // uso el middleware para "importar" las rutas
   routes = () => {
