@@ -1,17 +1,9 @@
 const { response } = require('express');
 var bcrypt = require('bcryptjs');
-const { validationResult } = require('express-validator');
 const Usuario = require('../models/usuario.model');
 
 const getFunction = async (req, res = response) => {
   const { limit = 5, desde = 0 } = req.query;
-
-  if (!Number(limit) || !Number(desde)) {
-    res.status(400).json({
-      ok: false,
-      msg: 'Los parámetros limit y desde deben ser números',
-    });
-  }
 
   // PUEDO HACERLO ASÍ, Y DE ESTA FORMA UNA PROMESA SE EJECULA LUEGO DE LA OTRA:
   // const usuarios = await Usuario.find({ estado: true })
