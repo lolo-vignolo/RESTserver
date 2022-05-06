@@ -43,8 +43,11 @@ const UsuarioSchema = new Schema({
 });
 
 //toObject es para que no se muestre el password en el json que de devuelvo al cliente.
+// todo lo que extraifo del objeto queda fuera d ela respuesta al usuario, pero si quiero que vaya a al usuario la respueta
+// pero por ejemplo con un keyName diferente, puedo hacer como con _id. Lo extraigo, lo trabajo y lo devuelvo.
 UsuarioSchema.methods.toJSON = function () {
-  const { __v, password, ...object } = this.toObject();
+  const { __v, password, _id, ...object } = this.toObject();
+  object.uid = _id;
   return object;
 };
 

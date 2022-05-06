@@ -1,6 +1,6 @@
 **al server lo pueso hacer tipo classes o sin**
 
-**middlewares** se ejecutan antes de las Rutas.
+**middlewares** se ejecutan antes de las Rutas. siempre reciben (req, res, next). En el caso que en la función principar no reciba estos argumentos, esta debe retornar un callback con ellos. Se llevo a cabo esto en el validar.rol.js donde se valida los roles. La función principal recibe un array, el cual servira para la verificación.
 _this.app.use(express.static('public'))_ lo utilizamos para que lea los archivos HTML (generalmente) de la carpeta "public".
 como puedo observar tengo varios, el "cors" que es para el manejo de rutas, luego el "json" para avisarle al servidor que va a recibir info formato json. Todos estos middleware se ejecutan antes de que vaya a cualquier ruta o method (get, put, push, etc)
 
@@ -83,3 +83,32 @@ Lo que me permite esto es modificar la informacón que se enviara en la respuest
 **method find() y countDocuments()** el find lo ustilizo para traer la lista que tengo en la coleccion, miesntras que el countDocumetns me dice el numero de registros que tengo. A ambos le puedo pasar un parametro en forma de objeto , como restriccion que debe tener para ser llamado. De esta forma puedo evitar traer algun usuario específico por ejemplo.
 
 **method DELETE** antes se eliminaba directamente por ejemplo el usuario de la base de datos, para lo cual tomando el "ID" enviado se llamaba al metodo .findByIdAndDelete(id) , ahora lo que se hace es dejarlo pero cambiarle el estado. Como se ve en el GET, para que un usuario sea llamado debe tener un estado "true", por lo cual para "eliminarlo" de la vista del customer pasamos el estado a "false" pero sigue dentro de la base de datos.
+
+**findOne({propiedad})** me permite ver si en mi DB hay alguna propiedad con el key de la propiedad que paso como argumento.
+
+**JWT** no funciona con promesa sino con un call back , por lo cual para hacerlo funcionar con promesas creo un _new Promise_(resolve , reject). Entoncec cuando se ejecute el call back lo que va a hacer es o bien resolve la promesa o rejectarla. Creando una promesa me permite utilizar el async and await.
+
+**Los token** se crean de forma constante y permanecen por uan cantidad de tiempo que yo quiere. Este token aparecera y desaparecera una vez vencido. cuando desaparece, el usuario debera generar otro por ejemplo a traves de un login para seguir en la pagina. Mientras el token este activo podrá navegar. Este token tiene tre parts , header: es el encryptador, payload: información que brinda el usuario(en este caso utilizaremos el ID creado por mongo), por ultimo la firma que es lo que le ineresa a la persona que hace el back para ver si es o no valido
+
+**cambiar la estructura del objeto al retornar al cliente**
+
+```
+UsuarioSchema.methods.toJSON = function () {
+  const { __v, password, _id, ...object } = this.toObject();
+  object.uid = _id;
+  return object;
+};
+```
+
+Todo lo que extraifo del objeto queda fuera d ela respuesta al usuario, pero si quiero que vaya a al usuario la respueta
+pero por ejemplo con un keyName diferente, puedo hacer como con \_id. Lo extraigo, lo trabajo y lo devuelvo.
+
+**los token estan en el HEADERS de la request** a diferencia de la info que ingresa el usuario. El Token que se genera solo y tendrá una duración determinada lo recibimos a traves del head de la petición HTTP.
+El token es por lo general almacenado en Cookies o en el LocalStorage del navegador, y cuando es requerido enviar un request al servidor, se recupere y se envía como header.
+
+**para validar los toke cuenta con dos pasos**
+
+- primero ver si existe algún token activo, para eso debo ver en el _request.header_ si viene algun token alli. De ser falso, res.json(401) no hay token.
+- De ser True, validar si ese token que está activo digamos en el local storage, coincide con el token del usuario. Para ello comparo el token que obtengo del _req.header_ con el Token que obtengo del usuario a traves del _req.body_. De coincidir se lleva a cabo la operacion. Lo contrario res.json(401) token incalido.
+
+**req.usuario , req.stanley** es importante tener en cuenta que en el objeto req, puedo crear cualquier propiedad y asignarle cualquier valor, a las cuales podré acceder en cualquier parte del codigo.

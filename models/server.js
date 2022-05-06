@@ -6,6 +6,7 @@ class Server {
   constructor() {
     this.app = express();
     this.usuariosRutesPath = '/api/usuarios';
+    this.authPath = '/api/auth';
 
     // conectar DB
     this.conectarDB();
@@ -37,6 +38,7 @@ class Server {
 
   // uso el middleware para "importar" las rutas
   routes = () => {
+    this.app.use(this.authPath, require('../routes/auth.routes'));
     this.app.use(this.usuariosRutesPath, require('../routes/usuarios.routes'));
   };
 

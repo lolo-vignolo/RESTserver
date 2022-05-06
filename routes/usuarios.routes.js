@@ -1,6 +1,5 @@
 const { Router } = require('express');
 const { check } = require('express-validator');
-const router = Router();
 
 const {
   getFunction,
@@ -10,9 +9,13 @@ const {
 } = require('../controllers/usuarios.controllers');
 
 const { esRoleValido, existEmail, existId } = require('../helpers/validators');
+
 const { controlCamposResult } = require('../middlewares/control.campos');
+const { validarJWT } = require('../middlewares/validarJWT');
+const { validarRol, tieneRol } = require('../middlewares/validar.rol');
 
 // cualquier cosa que agregue al "/" se agregara en la ruta despues de la ruta establecida en el constructor
+const router = Router();
 
 router.get('/', getFunction);
 
@@ -53,6 +56,9 @@ router.post(
 router.delete(
   '/:id',
   [
+    validarJWT,
+    //validarRol, //SOLO ADMIN_ROLE puede eliminar usuarios
+    tieneRol('ADMIN_ROLE', 'MOD_ROLE'),
     check('id', 'No es valido').isMongoId(),
     check('id').custom(existId),
     controlCamposResult,
